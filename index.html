@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="UTF-8">
-  <title>Get User Media Code Along!</title>
+  <title>Webcam</title>
   <link rel="stylesheet" href="style.css">
 </head>
 
@@ -12,6 +12,9 @@
   <div class="photobooth">
     <div class="controls">
       <button onClick="takePhoto()">Take Photo</button>
+      <button onClick="toggleRedEffects()"> Toggle Red Effects</button>
+      <button onclick="toggleRgbSplit()"> Toggle RGB Split</button>
+      <button onclick="toggleGhostingEffects()"> Toggle Ghosting Effects</button>
     </div>
     <canvas class="photo"></canvas>
     <video class="player"></video>

@@ -4,6 +4,30 @@ const ctx = canvas.getContext('2d');
 const strip = document.querySelector('.strip');
 const snap = document.querySelector('.snap');
 
+
+let isRed = false;
+let isRgbSplit = false;
+let isGhosting = false;
+
+
+const toggleRedEffects = () => {
+  isRed = !isRed;
+  if (isRed) {
+    isGhosting = false;
+  }
+}
+
+const toggleRgbSplit = () => {
+  isRgbSplit = !isRgbSplit;
+}
+
+const toggleGhostingEffects = () => {
+  isGhosting = !isGhosting;
+  if (isGhosting) {
+    isRed = false;
+  }
+}
+
 function getVideo() {
   navigator.mediaDevices.getUserMedia({ video: true, audio: false })
     .then(localMediaStream => {
@@ -16,25 +40,38 @@ function getVideo() {
 }
 
 function paintToCanvas() {
-  const width = video.videoWidth;
-  const height = video.videoHeight;
+  const width = window.innerWidth > video.videoWidth? video.videoWidth : window.innerWidth;
+  const height = window.innerHeight > video.videoHeight? video.videoHeight : window.innerHeight;
   canvas.width = width;
   canvas.height = height;
 
-  return setInterval(() => {                         //updates feed every 16ms
+  return setInterval(() => {                         //updates feed every 16ms (60 frames/second)
     ctx.drawImage(video, 0, 0, width, height);       //takes the image from the video starting from x=0, y=0 and draws it on the canvas
 
     let pixels = ctx.getImageData(0, 0, width, height);   //gives an array of pixels starting from 0,0 and has the r,b,g,a of each pixel stored.
 
-    // mess with them
-    // pixels = redEffect(pixels);                         //remove comment to enable red Effect
+    if (isRed) {
+      pixels = redEffect(pixels);
 
-    // pixels = rgbSplit(pixels);                           //remove comment to enable rgb split effect.
-    // ctx.globalAlpha = 0.1;                                //ghosting effect;
+    }
+
+    if (isRgbSplit) {
+      pixels = rgbSplit(pixels);
+      ctx.globalAlpha = 1;                                //ghosting effect;
+    }
+
+    if (isGhosting) {
+      ctx.globalAlpha = 0.01;
+    }
+
+
+    if (!isRgbSplit && !isGhosting) {
+      ctx.globalAlpha = 1;
+    }
 
     // put them back
     ctx.putImageData(pixels, 0, 0);                           //display the manipulated pixels
-  }, 16);
+  }, 1000/60);
 }
 
 function takePhoto() {
@@ -53,7 +90,7 @@ function takePhoto() {
 
 function redEffect(pixels) {
   for (let i = 0; i < pixels.data.length; i += 4) {                       //i+=4 since each pixel is represented with 4 elements rgba
-    pixels.data[i + 0] = pixels.data[i + 0] + 200; // RED               //pump up red;
+    pixels.data[i + 0] = pixels.data[i + 0] + 80; // RED               //pump up red;
     pixels.data[i + 1] = pixels.data[i + 1] - 50; // GREEN              
     pixels.data[i + 2] = pixels.data[i + 2] * 0.5; // Blue
   }
